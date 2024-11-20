@@ -1,4 +1,4 @@
-'use client'; // so clients can read off the page
+"use client";
 import { useState, useEffect, ChangeEvent } from "react";
 
 // Define interfaces for Book and VolumeInfo to provide type safety
@@ -35,7 +35,6 @@ export default function Bookfinder() {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch data."); // Handle non-OK responses
-        console.log(error);
       }
 
       const data = await response.json();
@@ -125,7 +124,10 @@ export default function Bookfinder() {
       {/* Book List */}
       <ul className="book-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {books.map((book) => (
-          <li key={book.id} className="book border rounded-md p-4">
+          <li
+            key={book.id}
+            className="book border rounded-md p-4 transition duration-300 hover:bg-black hover:text-white"
+          >
             {/* Book Thumbnail */}
             {book.volumeInfo.imageLinks?.thumbnail && (
               <img
@@ -142,7 +144,7 @@ export default function Bookfinder() {
               <p className="text-sm text-gray-600">
                 {book.volumeInfo.authors?.join(", ") || "Unknown Author"}
               </p>
-              <p className="text-sm text-gray-700 mt-2">
+              <p className="text-sm mt-2">
                 {book.volumeInfo.description
                   ? book.volumeInfo.description
                   : "No description available"}
