@@ -36,7 +36,7 @@ export default function App() {
     async function fetchData() {
       try {
         // Fetch the first 25 Pokemon from the PokeAPI
-        const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1000");
+        const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=500");
         const data = await response.json(); // Parse the response as JSON
 
         const pokemonDataList: Pokemon[] = []; // Array to store the detailed Pokemon data
