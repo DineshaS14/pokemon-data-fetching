@@ -1,13 +1,7 @@
 'use client';
-import Image from "next/image";
 import { useState, useEffect, ChangeEvent } from "react";
 // ChangeEvent provides type safety for event handlers
-interface Type {
-  slot: number;
-  type: {
-    name: string;
-    url: string;
-  };
+
 }
 // Defining the structure of pokemon object that is same as API response
 // to save in our state array
