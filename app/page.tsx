@@ -1,101 +1,119 @@
+'use client';
 import Image from "next/image";
+import { useState, useEffect, ChangeEvent } from "react";
+// ChangeEvent provides type safety for event handlers
+interface Type {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+// Defining the structure of pokemon object that is same as API response
+// to save in our state array
+interface Pokemon {
+  id: number;
+  name: string;
+  sprites: {
+    front_default: string;
+  };
+  url?: string;
+  types: {
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    }; // Added types to the Pokemon interface
+  };
+  weight?: number;
+
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [pokemonList, setPokemonList] = useState<Pokemon[]>([]);
+  const [filteredPokemonList, setFilteredPokemonList] = useState<Pokemon[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(()=> {
+    async function fetchData() {
+      try{
+        const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1000");
+        const data = await response.json(); //comes with a link to each pokemon, need to extract indiv
+        if (!response.ok) {
+          throw new Error("Pokemons were not fetched");
+        }
+        const pokemonDataList: Pokemon[]  = [];
+        for (const pokemon of data.results) {
+          const individualPokemonResponse = await fetch(pokemon.url);
+          const pokemonData = await individualPokemonResponse.json();
+          pokemonDataList.push(pokemonData);
+        } // for  
+        setPokemonList(pokemonDataList);
+        setFilteredPokemonList(pokemonDataList);
+      } catch(error) {
+        console.log("Error fetching data: ", error);
+      } // try catch
+    } // fetchData
+    
+    fetchData();
+  }, [] );
+
+  function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {
+    const searchTerm = event.target.value.toLowerCase();
+    const filtered = pokemonList.filter((pokemon) =>
+      pokemon.name.toLowerCase().startsWith(searchTerm)
+    );
+    setFilteredPokemonList(filtered);
+  }
+// Type color mapping (you can expand this for more types)
+const typeColors: { [key: string]: string } = {
+  grass: 'bg-green-500',
+  poison: 'bg-purple-500',
+  fire: 'bg-red-500',
+  water: 'bg-blue-500',
+  electric: 'bg-yellow-500',
+  normal: 'bg-gray-500',
+  // Add more types as needed
+};
+return (
+  <div className="h-screen w-full bg-custom-bg bg-cover bg-center font-sans text-center ">
+    <h1 className="text-5xl text-black font-bold italic py-4">Pokemon List</h1>
+    <div>
+      <input
+        type="text"
+        placeholder="Search Pokemon..."
+        onChange={handleFilterChange}
+        className="border-2 border-gray-300 p-2 rounded-md"
+      />
     </div>
-  );
+    <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5 p-4">
+      {filteredPokemonList.map((pokemon) => (
+        <li key={pokemon.id} className="pokemon bg-gray-100 border-3 border-gray-300 rounded-xl p-4 text-center">
+          <p className="font-medium text-xl">
+            {pokemon.id}. {pokemon.name[0].toUpperCase() + pokemon.name.slice(1)}
+          </p>
+
+          <div className="flex items-center justify-center space-x-2 mt-2">
+            {/* Display Weight */}
+            <p className="font-small text-sm">Weight: {pokemon.weight}</p>
+
+            {/* Display Types with dynamic colors */}
+            {pokemon.types.map((typeObj, index) => {
+              const type = typeObj.type.name; // Extract the type name
+              return (
+                <span
+                  key={index}
+                  className={`inline-block ${typeColors[type] || 'bg-gray-500'} text-white rounded-full px-2 py-1 text-sm`}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)} {/* Capitalize the type name */}
+                </span>
+              );
+            })}
+          </div>
+
+          <img src={pokemon.sprites.front_default} alt={pokemon.name} className="mx-auto mt-2" />
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 }
