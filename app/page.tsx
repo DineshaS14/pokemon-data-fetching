@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from "react";
 
 // Define TypeScript interfaces for strict typing
