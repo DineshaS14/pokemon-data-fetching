@@ -50,8 +50,8 @@ export default function Bookfinder() {
       setBooks(filteredBooks); // Update book list
       setLoading(false); // Set loading to false
     } catch (error) {
-      setError("Error fetching data. Please try again later."); // Set error message
-      setLoading(false); // Set loading to false
+        setError((error as Error).message); // Type assertion
+        setLoading(false); // Set loading to false
     }
   }
 
