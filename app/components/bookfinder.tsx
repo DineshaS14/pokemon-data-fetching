@@ -35,6 +35,7 @@ export default function Bookfinder() {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch data."); // Handle non-OK responses
+        console.log(error);
       }
 
       const data = await response.json();
