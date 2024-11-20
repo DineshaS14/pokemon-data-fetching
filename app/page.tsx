@@ -2,7 +2,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 // ChangeEvent provides type safety for event handlers
 
-}
+
 // Defining the structure of pokemon object that is same as API response
 // to save in our state array
 interface Pokemon {
